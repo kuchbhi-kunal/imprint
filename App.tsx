@@ -416,16 +416,6 @@ function Main() {
                   {countToday(log)} today · saved on this phone
                 </Text>
               </View>
-              <Group>
-                <Pressable onLongPress={() => setShowKey((v) => !v)} delayLongPress={600}>
-                  <Row icon="key-outline" title="Key" value={keyFingerprint()} />
-                </Pressable>
-                {showKey ? (
-                  <Text selectable style={[type.footnote, styles.keyText, { color: t.secondary }]}>
-                    {fullKeyHex()}
-                  </Text>
-                ) : null}
-              </Group>
               {log.length > 0 ? (
                 <View style={styles.listSection}>
                   <Text style={[type.footnote, styles.listHeading, { color: t.secondary }]}>All activated cards</Text>
@@ -448,6 +438,19 @@ function Main() {
                 </View>
               ) : null}
               <AdminGuide />
+              <View style={styles.listSection}>
+                <Text style={[type.footnote, styles.listHeading, { color: t.secondary }]}>Key fingerprint</Text>
+                <Group>
+                  <Pressable onLongPress={() => setShowKey((v) => !v)} delayLongPress={600}>
+                    <Row icon="key-outline" title="Key" value={keyFingerprint()} />
+                  </Pressable>
+                  {showKey ? (
+                    <Text selectable style={[type.footnote, styles.keyText, { color: t.secondary }]}>
+                      {fullKeyHex()}
+                    </Text>
+                  ) : null}
+                </Group>
+              </View>
             </>
           ) : (
             <Pressable onPress={onRead} disabled={busy} style={styles.hero}>
