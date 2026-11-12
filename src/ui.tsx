@@ -375,30 +375,6 @@ export function PasswordSheet({
   );
 }
 
-/* ---------- Admin gate: a bare input, nothing written ---------- */
-
-export function BlankPrompt({ visible, onSubmit, onCancel }: { visible: boolean; onSubmit: (v: string) => void; onCancel: () => void }) {
-  const t = useTheme();
-  const [value, setValue] = useState('');
-  // Fixed position in the upper third (above any keyboard) — no keyboard-avoiding resize, so it never jitters.
-  return (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onCancel} onShow={() => setValue('')}>
-      <View style={[s.blankScrim, { backgroundColor: t.scrim }]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} />
-        <View style={[s.group, s.blankBox, { backgroundColor: t.sheet }]}>
-          <PasswordInput
-            value={value}
-            onChangeText={setValue}
-            onSubmitEditing={() => onSubmit(value)}
-            autoFocus
-            returnKeyType="done"
-          />
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
 /* ---------- Toast ---------- */
 
 export type ToastMsg = { text: string; icon: keyof typeof Ionicons.glyphMap; tone?: 'error'; id: number } | null;
@@ -490,8 +466,6 @@ const s = StyleSheet.create({
   scrim: { flex: 1, justifyContent: 'flex-end', padding: 8 },
   sheet: { borderRadius: 36, alignItems: 'center', paddingTop: 28, paddingHorizontal: 20, gap: 16 },
   promptSheet: { paddingTop: 24, gap: 14 },
-  blankScrim: { flex: 1, justifyContent: 'flex-start', paddingTop: '32%', paddingHorizontal: 40 },
-  blankBox: { alignSelf: 'stretch' },
   sheetIconWrap: { width: 140, height: 140, alignItems: 'center', justifyContent: 'center', marginVertical: 8 },
   sheetIcon: { width: 96, height: 96, borderRadius: 48, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   pulse: { position: 'absolute', width: 96, height: 96, borderRadius: 48, borderWidth: 2 },

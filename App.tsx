@@ -4,15 +4,25 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NfcAvailability, NfcCancelled, cancelScan, friendlyError, initNfc, openNfcSettings, readTag } from './src/nfc';
-import { CardDiagnostics, activateCard, eraseImprint, removeImprintPassword, writeImprint } from './src/ntag';
+import { CardDiagnostics, eraseImprint, removeImprintPassword, writeImprint } from './src/ntag';
 import { FIELDS, FormValues, INSTANT_OPEN_APP, RECORD_KINDS, RecordKind, buildRecords, describeRecord, messageBytes, missingFields, visibleRecords } from './src/records';
-import { LogEntry, countToday, exportCsv, formatWhen, loadLog, recordActivation } from './src/activationLog';
-import { checkAdminPassword, fullKeyHex, keyFingerprint } from './src/admin';
-import { AdminGuide } from './src/AdminGuide';
+// Public app: './src/admin' resolves to stubs (index.public.ts). Admin app: the real activation tools.
+import {
+  AdminGuide,
+  IS_ADMIN,
+  LogEntry,
+  activateCard,
+  countToday,
+  exportCsv,
+  formatWhen,
+  fullKeyHex,
+  keyFingerprint,
+  loadLog,
+  recordActivation,
+} from './src/admin';
 import { AnimatedSplash } from './src/Splash';
 import { type, useTheme } from './src/theme';
 import {
-  BlankPrompt,
   Group,
   IconPicker,
   Input,
@@ -72,7 +82,7 @@ function Main() {
   const insets = useSafeAreaInsets();
 
   const [availability, setAvailability] = useState<NfcAvailability | 'checking' | 'preview'>('checking');
-  const [tab, setTab] = useState<Tab>('write');
+  const [tab, setTab] = useState<Tab>(IS_ADMIN ? 'activate' : 'write');
   const [kind, setKind] = useState<RecordKind>('url');
   const [values, setValues] = useState<FormValues>({});
   const [protect, setProtect] = useState(false);
@@ -84,12 +94,13 @@ function Main() {
   const [toast, setToast] = useState<ToastMsg>(null);
   const [card, setCard] = useState<CardView | null>(null);
   const previewCancel = useRef<(() => void) | null>(null);
-  // Hidden admin mode: tap the "imprint" title 7 times quickly to toggle card activation.
-  const [admin, setAdmin] = useState(false);
-  const titleTaps = useRef<number[]>([]);
+  // Admin features exist only in the separate "imprint admin" app build.
+  const admin = IS_ADMIN;
   const [log, setLog] = useState<LogEntry[]>([]);
-  const [askAdmin, setAskAdmin] = useState(false);
   const [showKey, setShowKey] = useState(false);
+  useEffect(() => {
+    if (IS_ADMIN) loadLog().then(setLog);
+  }, []);
 
   const preview = availability === 'preview';
   const useOwnSheet = Platform.OS === 'android' || preview; // iOS shows a system sheet
@@ -141,38 +152,6 @@ function Main() {
     setSheet(null); // close right away; session cleanup finishes in the background
     if (previewCancel.current) previewCancel.current();
     else cancelScan({ immediate: true });
-  }
-
-  function onTitleTap() {
-    const now = Date.now();
-    titleTaps.current = [...titleTaps.current.filter((ts) => now - ts < 3000), now];
-    if (titleTaps.current.length >= 7) {
-      titleTaps.current = [];
-      if (admin) {
-        exitAdmin();
-      } else {
-        setAskAdmin(true);
-      }
-    }
-  }
-
-  function exitAdmin() {
-    setAdmin(false);
-    setShowKey(false);
-    if (tab === 'activate') setTab('write');
-    haptic.select();
-  }
-
-  function onAdminPassword(value: string) {
-    setAskAdmin(false);
-    if (checkAdminPassword(value)) {
-      haptic.success();
-      setAdmin(true);
-      setTab('activate');
-      loadLog().then(setLog);
-    } else {
-      haptic.error();
-    }
   }
 
   async function onActivate() {
@@ -279,10 +258,7 @@ function Main() {
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <View style={styles.titleRow}>
-            {/* plain touch area (no press highlight) so the hidden gesture leaves no visual hint */}
-            <Pressable onPress={onTitleTap} android_disableSound focusable={false} accessible={false}>
-              <Text style={[type.largeTitle, { color: t.text }]}>imprint</Text>
-            </Pressable>
+            <Text style={[type.largeTitle, { color: t.text }]}>imprint</Text>
             {preview && <Pill text="Preview" theme={t} />}
             {admin && <Pill text="Admin" theme={t} />}
           </View>
@@ -290,9 +266,9 @@ function Main() {
             value={tab}
             onChange={setTab}
             options={[
+              ...(admin ? [{ value: 'activate' as Tab, label: 'Activate' }] : []),
               { value: 'write', label: 'Write' },
               { value: 'read', label: 'Read' },
-              ...(admin ? [{ value: 'activate' as Tab, label: 'Activate' }] : []),
             ]}
           />
         </View>
@@ -414,7 +390,7 @@ function Main() {
               </View>
               {admin && card.diag ? (
                 <View style={styles.listSection}>
-                  <Text style={[type.footnote, styles.listHeading, { color: t.secondary }]}>Diagnostics (admin)</Text>
+                  <Text style={[type.footnote, styles.listHeading, { color: t.secondary }]}>Diagnostics</Text>
                   <Group>
                     <Row title="Chip" value={card.diag.chip} />
                     {card.diag.uid ? <Row title="UID" value={card.diag.uid} /> : null}
@@ -488,10 +464,7 @@ function Main() {
           {tab === 'activate' ? (
             <>
               <PrimaryButton title="Activate Card" onPress={onActivate} disabled={busy} />
-              <View style={styles.plainRow}>
-                <PlainButton title={`Export List (${log.length})`} onPress={onExport} disabled={busy || log.length === 0} />
-                <PlainButton title="Exit Admin" onPress={exitAdmin} disabled={busy} />
-              </View>
+              <PlainButton title={`Export List (${log.length})`} onPress={onExport} disabled={busy || log.length === 0} />
             </>
           ) : tab === 'write' ? (
             <>
@@ -523,7 +496,6 @@ function Main() {
         onSubmit={onRemovePassword}
         onCancel={() => setAskRemove(false)}
       />
-      <BlankPrompt visible={askAdmin} onSubmit={onAdminPassword} onCancel={() => setAskAdmin(false)} />
       <ScanSheet state={sheet} onCancel={onCancel} />
       <Toast msg={toast} onDone={() => setToast(null)} />
     </View>

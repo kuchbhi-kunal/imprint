@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
-import { type, useTheme } from './theme';
-import { Group } from './ui';
+import { type, useTheme } from '../theme';
+import { Group } from '../ui';
 
 type Item = { icon?: keyof typeof Ionicons.glyphMap; title: string; body: string };
 

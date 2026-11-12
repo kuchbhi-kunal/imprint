@@ -5,14 +5,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import type { ActivationResult } from './ntag';
+import type { ActivationResult, LogEntry } from './types';
 
-export type LogEntry = {
-  uid: string;
-  chip: string;
-  activatedAt: string; // ISO timestamp of first activation seen on this phone
-  note?: string; // e.g. "already active" when first seen here already activated
-};
+export type { LogEntry };
 
 const KEY = 'imprint.activations.v1';
 
