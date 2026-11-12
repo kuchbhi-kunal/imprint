@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# imprint brand secret — never commit (restore from the private backup; see README)
+src/secret.ts
