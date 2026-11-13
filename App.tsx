@@ -86,7 +86,7 @@ function Main() {
   const [kind, setKind] = useState<RecordKind>('url');
   const [values, setValues] = useState<FormValues>({});
   const [protect, setProtect] = useState(false);
-  const [instantOpen, setInstantOpen] = useState(true);
+  const [instantOpen, setInstantOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [askRemove, setAskRemove] = useState(false);
   const [sheet, setSheet] = useState<SheetState>(null);
@@ -302,14 +302,18 @@ function Main() {
               </Group>
 
               {INSTANT_OPEN_APP[kind] ? (
-                <Group>
-                  <Row
-                    icon="flash-outline"
-                    title="Instant Open"
-                    subtitle="Android opens it without a prompt"
-                    right={<MonoSwitch value={instantOpen} onValueChange={setInstantOpen} />}
-                  />
-                </Group>
+                <View style={styles.listSection}>
+                  <Group>
+                    <Row
+                      icon="flash-outline"
+                      title="Instant Open"
+                      right={<MonoSwitch value={instantOpen} onValueChange={setInstantOpen} />}
+                    />
+                  </Group>
+                  <Text style={[type.footnote, styles.groupNote, { color: t.secondary }]}>
+                    Opens the link in Chrome straight away, without asking which app to use. Android only. Recommended for links that need to open in Chrome.
+                  </Text>
+                </View>
               ) : null}
 
               <Group>
@@ -524,6 +528,7 @@ const styles = StyleSheet.create({
   storageTop: { flexDirection: 'row', justifyContent: 'space-between' },
   bar: { height: 6, borderRadius: 3, overflow: 'hidden' },
   barFill: { height: 6, borderRadius: 3 },
+  groupNote: { paddingHorizontal: 16 },
   listHeading: { textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 16 },
   keyText: { paddingHorizontal: 16, paddingBottom: 14, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
 });
