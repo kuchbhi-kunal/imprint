@@ -311,7 +311,7 @@ function Main() {
                     />
                   </Group>
                   <Text style={[type.footnote, styles.groupNote, { color: t.secondary }]}>
-                    Opens the link in Chrome straight away, without asking which app to use. Android only. Recommended for links that need to open in Chrome.
+                    Opens the link in Chrome straight away, without a prompt to open the URL. Android only. Recommended for links that need to open in Chrome.
                   </Text>
                 </View>
               ) : null}
