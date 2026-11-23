@@ -7,4 +7,4 @@ imprint helps you write to NFC (near field communication) cards and tags from yo
 - **Password** to stop anyone else changing or erasing a card.
 - **Instant Open** to open links straight in Chrome on Android.
 
-Writing works on imprint cards by 3AM Builds. Other cards can still be read.
+Writing works on imprint cards. Other cards can still be read.
