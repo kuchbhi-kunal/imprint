@@ -42,3 +42,6 @@ yarn-error.*
 
 # imprint brand secret — never commit (restore from the private backup; see README)
 src/secret.ts
+
+# Landing page download (built APK, not source)
+/landing/*.apk

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>imprint</title>
+  <meta name="description" content="Write links, phone numbers and SMS to NFC cards with a tap. Download imprint for Android." />
+  <meta name="theme-color" content="#000000" />
+  <meta property="og:title" content="imprint" />
+  <meta property="og:description" content="Write to NFC cards with a tap." />
+  <meta property="og:image" content="icon.png" />
+  <link rel="icon" href="favicon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <style>
+    :root {
+      --bg: #000;
+      --surface: #1c1c1e;
+      --surface-2: #2c2c2e;
+      --text: #fff;
+      --secondary: rgba(235, 235, 245, 0.6);
+      --tertiary: rgba(235, 235, 245, 0.3);
+      --separator: rgba(84, 84, 88, 0.6);
+      --success: #30d158;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: max(56px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom));
+    }
+    main { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; flex: 1; }
+
+    .icon {
+      width: 112px; height: 112px; border-radius: 26px;
+      box-shadow: 0 0 0 1px var(--separator), 0 20px 60px rgba(255, 255, 255, 0.06);
+      animation: rise 0.7s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    h1 {
+      margin-top: 28px; font-size: 44px; font-weight: 700; letter-spacing: -1.2px;
+      animation: rise 0.7s 0.06s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    .tagline {
+      margin-top: 8px; font-size: 19px; color: var(--secondary); text-align: center;
+      animation: rise 0.7s 0.12s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    .cta { width: 100%; margin-top: 40px; animation: rise 0.7s 0.18s cubic-bezier(.2, .8, .2, 1) both; }
+    .button {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; height: 56px; border-radius: 28px;
+      background: var(--text); color: #000;
+      font-size: 17px; font-weight: 600; text-decoration: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .button:hover { opacity: 0.9; }
+    .button:active { transform: scale(0.98); }
+    .button ion-icon { font-size: 22px; }
+    .meta { margin-top: 12px; font-size: 13px; color: var(--secondary); text-align: center; }
+
+    .notice {
+      display: none; width: 100%; margin-top: 16px; padding: 14px 16px; border-radius: 14px;
+      background: var(--surface); color: var(--secondary); font-size: 15px; text-align: center;
+    }
+    .is-ios .notice { display: block; }
+
+    .group {
+      width: 100%; margin-top: 40px; background: var(--surface); border-radius: 14px; overflow: hidden;
+      animation: rise 0.7s 0.24s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    .row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; position: relative; }
+    .row + .row::before {
+      content: ""; position: absolute; top: 0; left: 62px; right: 0; height: 0.5px; background: var(--separator);
+    }
+    .row-icon {
+      flex: none; width: 32px; height: 32px; border-radius: 8px; background: var(--text); color: #000;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .row-title { font-size: 17px; }
+    .row-sub { font-size: 13px; color: var(--secondary); margin-top: 2px; }
+
+    .heading {
+      width: 100%; margin-top: 36px; padding: 0 16px 8px;
+      font-size: 13px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--secondary);
+    }
+    .steps { margin-top: 0; }
+    .step-num {
+      flex: none; width: 26px; height: 26px; border-radius: 13px; border: 1px solid var(--tertiary);
+      display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--secondary);
+      margin: 0 3px;
+    }
+
+    .qr { display: none; flex-direction: column; align-items: center; margin-top: 36px; }
+    .is-desktop .qr { display: flex; }
+    .qr-box { background: #fff; padding: 12px; border-radius: 16px; }
+    .qr-box img, .qr-box canvas { display: block; width: 136px; height: 136px; }
+    .qr p { margin-top: 12px; font-size: 13px; color: var(--secondary); }
+
+    footer { margin-top: 48px; font-size: 13px; color: var(--tertiary); text-align: center; }
+    footer a { color: var(--secondary); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <img class="icon" src="icon.png" alt="imprint icon" width="112" height="112" />
+    <h1>imprint</h1>
+    <p class="tagline">Write to NFC cards with a tap.</p>
+
+    <div class="cta">
+      <a class="button" href="imprint.apk" download="imprint.apk">
+        <ion-icon name="logo-android" aria-hidden="true"></ion-icon>
+        Download for Android
+      </a>
+      <p class="meta">Version 1.0.0 · 22.3 MB</p>
+      <p class="notice">iPhone version coming soon. Open this page on an Android phone to install.</p>
+    </div>
+
+    <div class="group">
+      <div class="row">
+        <div class="row-icon"><ion-icon name="link-outline"></ion-icon></div>
+        <div><div class="row-title">Write</div><div class="row-sub">Link, phone or SMS</div></div>
+      </div>
+      <div class="row">
+        <div class="row-icon"><ion-icon name="scan-outline"></ion-icon></div>
+        <div><div class="row-title">Read</div><div class="row-sub">See what’s on any card</div></div>
+      </div>
+      <div class="row">
+        <div class="row-icon"><ion-icon name="key-outline"></ion-icon></div>
+        <div><div class="row-title">Password</div><div class="row-sub">Only you can change it</div></div>
+      </div>
+      <div class="row">
+        <div class="row-icon"><ion-icon name="flash-outline"></ion-icon></div>
+        <div><div class="row-title">Instant Open</div><div class="row-sub">Links open straight in Chrome</div></div>
+      </div>
+    </div>
+
+    <p class="heading">Install</p>
+    <div class="group steps">
+      <div class="row"><div class="step-num">1</div><div class="row-title">Tap Download for Android</div></div>
+      <div class="row"><div class="step-num">2</div><div class="row-title">Open the downloaded file</div></div>
+      <div class="row">
+        <div class="step-num">3</div>
+        <div><div class="row-title">Allow the install</div><div class="row-sub">If asked, allow installs from your browser</div></div>
+      </div>
+    </div>
+
+    <div class="qr" aria-hidden="true">
+      <div class="qr-box" id="qr"></div>
+      <p>Scan with your Android phone</p>
+    </div>
+
+    <footer>by <a href="https://3ambuilds.com">3AM Builds</a></footer>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    (function () {
+      var ua = navigator.userAgent || '';
+      var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var android = /Android/i.test(ua);
+      var root = document.documentElement;
+      if (ios) root.classList.add('is-ios');
+      if (!ios && !android) {
+        root.classList.add('is-desktop');
+        // QR only makes sense once the page is hosted at a real address.
+        if (/^https?:/.test(location.protocol) && window.QRCode) {
+          new QRCode(document.getElementById('qr'), {
+            text: location.href.split('#')[0], width: 272, height: 272,
+            colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
+          });
+        } else {
+          root.classList.remove('is-desktop');
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
